@@ -1,0 +1,22 @@
+{
+  "name": "cartographer",
+  "version": "1.0.0",
+  "description": "a simple weebhook to generate sitemap data to osu-wiki",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sr229/Cartographer.git"
+  },
+  "author": "",
+  "license": "BSD-3-Clause",
+  "bugs": {
+    "url": "https://github.com/sr229/Cartographer/issues"
+  },
+  "homepage": "https://github.com/sr229/Cartographer#readme",
+  "dependencies": {
+    "express": "^4.16.3"
+  }
+}
