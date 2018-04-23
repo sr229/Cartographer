@@ -14,7 +14,7 @@ global.router = express.Router();
 
 const BASE_URL ='https://api.github.com';
 const PORT = process.env.PORT || 8080;
-const SITEMAP_PATH = 'wiki/__sitemap.md';
+const SITEMAP_PATH = 'wiki/_sitemap.md';
 
 app.use(express.json());
 
