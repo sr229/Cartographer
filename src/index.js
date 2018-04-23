@@ -16,7 +16,7 @@ global.router = express.Router();
 let config;
 
 try {
-    config = JSON.parse(fs.readFileSync('./config.json'));
+    config = JSON.parse(fs.readFileSync('../config.json'));
 } catch(e) {
     config = {};
 }

@@ -3,3 +3,4 @@ node_modules
 .git
 .c9
 .eslintrc
+config.json
