@@ -16,7 +16,7 @@ global.router = express.Router();
 let config;
 
 try {
-    config = JSON.parse(fs.readFileSync('../config.json'));
+    config = JSON.parse(fs.readFileSync('./config.json'));
 } catch(e) {
     config = {};
 }
@@ -38,10 +38,10 @@ app.set('view engine', 'html');
 app.engine('html', engines.mustache);
 
 app.post('/cartographer-webhook', async (req, res) => {
-    console.log(req.body)
-    return;
-
     let body = req.body;
+
+    if ()
+
     let thisCommit = body.commits.find(c => c.id === body.after);
     
     if (!thisCommit || thisCommit.author.name === 'Cartographer') {
