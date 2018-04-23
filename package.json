@@ -17,6 +17,9 @@
   },
   "homepage": "https://github.com/sr229/Cartographer#readme",
   "dependencies": {
-    "express": "^4.16.3"
+    "consolidate": "^0.15.1",
+    "express": "^4.16.3",
+    "got": "^8.3.0",
+    "mustache": "^2.3.0"
   }
 }
