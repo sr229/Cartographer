@@ -6,6 +6,10 @@
   "scripts": {
     "start": "node src/index.js"
   },
+  "engines": {
+        "node": "^9.0.0",
+        "npm": "^4.0.0"
+    },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/sr229/Cartographer.git"

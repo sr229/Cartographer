@@ -7,16 +7,35 @@
 
 const express = require('express');
 const got = require('got');
-const app = express();
 const path = require('path');
 const engines = require('consolidate');
-global.router = express.Router();
+const fs = require('fs');
 
-const BASE_URL ='https://api.github.com';
-const PORT = process.env.PORT || 8080;
-const SITEMAP_PATH = 'wiki/_sitemap.md';
+const app = express();
+global.router = express.Router();
+let config;
+
+try {
+    config = JSON.parse(fs.readFileSync('./config.json'));
+} catch(e) {
+    config = {};
+}
+
+const PORT = process.env.PORT || config.port || 8080;
+const SITEMAP_PATH = process.env.SITEMAP_PATH || config.sitemapPath || 'wiki/_sitemap.md';
+const ACCESS_TOKEN = process.env.ACCESS_TOKEN || config.accessToken;
+const ACCESS_USER = process.env.ACCESS_USER || config.accessUser;
+
+if (!ACCESS_TOKEN) throw new Error('Missing required variable: "ACCESS_TOKEN". Must either be an environment variable, or "accessToken" in config.json');
+if (!ACCESS_USER) throw new Error('Missing required variable: "ACCESS_USER". Must either be an environment variable, or "accessUser" in config.json');
+
+const BASE_URL = `https://${ACCESS_USER}:${ACCESS_TOKEN}@api.github.com`;
 
 app.use(express.json());
+app.use(express.static(path.join(__dirname, 'public')));
+app.set('views', path.join(__dirname, 'views'));
+app.set('view engine', 'html');
+app.engine('html', engines.mustache);
 
 app.post('/cartographer-webhook', async (req, res) => {
     console.log(req.body)
@@ -76,6 +95,8 @@ app.post('/cartographer-webhook', async (req, res) => {
             }
         })
     });
+    
+    res.sendStatus(200);
 });
 
 /**
@@ -106,10 +127,10 @@ function genContent(tree) {
 
         // Recursive function for adding child paths to the above array, and then treating any of children the same way.
         (function looper(subTree, indent, fullPath) {
-            for (let child of Object.entries(subTree)) {
+            for (let child of subTree.entries()) {
                 thisTree.push(`${' '.repeat(indent + 1)}- [${child[0]}](${(fullPath + child[0]).replace(/\s+/g, '_')})`);
     
-                // Recursive with the child's tree, a new indent, and a new full path.
+                // Recurse with the child's tree, a new indent, and a new full path.
                 if (Object.keys(child[1]).length) looper(child[1], indent + 2, fullPath + child[0]);
             }
         })(children, 1, path);
@@ -133,16 +154,11 @@ app.get('/cartographer-webhook', (req, res) => {
     res.send('Go awau.');
 });
 
-app.listen(PORT, () => {
-    console.log(`Cartographer listening on ${PORT}`);
-});
 
 //needed if a discerning idiot does try to browse to index
 
 app.get('/', require('./routes/landing.js'));
 
-
-app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'html');
-app.engine('html', engines.mustache);
-app.use(express.static(path.join(__dirname, 'public')));
+app.listen(PORT, () => {
+    console.log(`Cartographer listening on ${PORT}`);
+});
