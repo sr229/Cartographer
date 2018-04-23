@@ -40,7 +40,11 @@ app.engine('html', engines.mustache);
 app.post('/cartographer-webhook', async (req, res) => {
     let body = req.body;
 
-    if (body.zen && )
+    if (body.zen && body.hook_id && body.hook) {
+        console.log('Received webhook ping event.');
+        res.sendStatus(200);
+        return;
+    }
 
     let thisCommit = body.commits.find(c => c.id === body.after);
     
