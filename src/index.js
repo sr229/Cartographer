@@ -40,7 +40,7 @@ app.engine('html', engines.mustache);
 app.post('/cartographer-webhook', async (req, res) => {
     let body = req.body;
 
-    if ()
+    if (body.zen && )
 
     let thisCommit = body.commits.find(c => c.id === body.after);
     
