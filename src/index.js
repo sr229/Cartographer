@@ -10,19 +10,22 @@ const got = require('got');
 const path = require('path');
 const engines = require('consolidate');
 const fs = require('fs');
+const YAML = require('yamljs');
 
 const app = express();
 global.router = express.Router();
 let config;
 
 try {
-    config = JSON.parse(fs.readFileSync('./config.json'));
+    config = YAML.parse(fs.readFileSync('./config.yml').toString());
 } catch(e) {
     config = {};
 }
 
-const PORT = process.env.PORT || config.port || 8080;
+const PORT = Number(process.env.PORT) || config.port || 8080;
 const SITEMAP_PATH = process.env.SITEMAP_PATH || config.sitemapPath || 'wiki/_sitemap.md';
+const SITEMAP_GEN_PATH = process.env.SITEMAP_GEN_PATH || config.sitemapGenPath || (SITEMAP_PATH.split('/').length > 1 ? SITEMAP_PATH.slice(SITEMAP_PATH.split('/').slice(-1)[0] + 1) : '');
+const SKIP_FILES = process.env.SKIP_FILES === 'true' || config.skipFiles || true;
 const ACCESS_TOKEN = process.env.ACCESS_TOKEN || config.accessToken;
 const ACCESS_USER = process.env.ACCESS_USER || config.accessUser;
 
@@ -62,7 +65,8 @@ app.post('/cartographer-webhook', async (req, res) => {
         }
     });
     let originalTree = JSON.parse(treeData.body).tree;
-    let tree = tree.map(v => v.type === 'tree' ? v.path + '/' : v.path).filter(v => v !== SITEMAP_PATH).reduce((m, val) => {
+    let tree = tree.filter(v => SKIP_FILES ? v.type === 'tree' : true).map(v => v.type === 'tree' ? v.path + '/' : v.path);
+    tree = tree.filter(v => v !== SITEMAP_PATH && v.startsWith(SITEMAP_GEN_PATH)).reduce((m, val) => {
         // tree is an array of paths, ie. 'file', 'dir/', 'dir/file'.
         // Directories end with a '/'.
         if (!val.includes('/') || (val.endsWith('/') && !m[val])) return Object.assign(m, {[val]: {}});
