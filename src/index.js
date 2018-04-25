@@ -134,7 +134,7 @@ function genContent(tree) {
         if (!Object.keys(children).length) return m.concat(`- [${path}](${path.replace(/\s+/g, '_')})`);
 
         // Make a new array with the path name.
-        let thisTree = [`- [${path}](${path.replace(/\s+/g, '_')}`];
+        let thisTree = [`- [${path}](${path.replace(/\s+/g, '_')})`];
 
         // Recursive function for adding child paths to the above array, and then treating any of children the same way.
         (function looper(subTree, indent, fullPath) {
