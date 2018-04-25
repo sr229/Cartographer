@@ -24,7 +24,7 @@ try {
 
 const PORT = Number(process.env.PORT) || config.port || 8080;
 const SITEMAP_PATH = process.env.SITEMAP_PATH || config.sitemapPath || 'wiki/_sitemap.md';
-const SITEMAP_GEN_PATH = process.env.SITEMAP_GEN_PATH || config.sitemapGenPath || (SITEMAP_PATH.split('/').length > 1 ? SITEMAP_PATH.slice(SITEMAP_PATH.split('/').slice(-1)[0] + 1) : '');
+const SITEMAP_GEN_PATH = process.env.SITEMAP_GEN_PATH || config.sitemapGenPath || (SITEMAP_PATH.split('/').length > 1 ? SITEMAP_PATH.slice(0, -(SITEMAP_PATH.split('/').slice(-1)[0].length + 1)) : '');
 const SKIP_FILES = process.env.SKIP_FILES === 'true' || config.skipFiles || true;
 const ACCESS_TOKEN = process.env.ACCESS_TOKEN || config.accessToken;
 const ACCESS_USER = process.env.ACCESS_USER || config.accessUser;
