@@ -74,6 +74,10 @@ app.post('/cartographer-webhook', async (req, res) => {
     tree = tree.filter(v => v !== SITEMAP_PATH && v.startsWith(SITEMAP_GEN_PATH)).reduce((m, val) => {
         // tree is an array of paths, ie. 'file', 'dir/', 'dir/file'.
         // Directories end with a '/'.
+        val = val.slice(SITEMAP_GEN_PATH.length);
+        
+        if (!val) return m;
+
         if (!val.includes('/')) return Object.assign(m, {[val]: {}});
         if (val.endsWith('/') && !m[val.slice(0, -1)]) return Object.assign(m, {[val.slice(0, -1)]: {}});
         
@@ -131,20 +135,20 @@ function genContent(tree) {
 
     return Object.entries(tree).reduce((m, [path, children]) => {
         // If there are no children for the path, add it and continue.
-        if (!Object.keys(children).length) return m.concat(`- [${path}](${path.slice(SITEMAP_GEN_PATH.length).replace(/\s+/g, '_')})`);
+        if (!Object.keys(children).length) return m.concat(`- [${path}](${path.replace(/\s+/g, '_')})`);
 
         // Make a new array with the path name.
-        let thisTree = [`- [${path}](${path.slice(SITEMAP_GEN_PATH.length).replace(/\s+/g, '_')})`];
+        let thisTree = [`- [${path}](${path.replace(/\s+/g, '_')})`];
 
         // Recursive function for adding child paths to the above array, and then treating any of children the same way.
         (function looper(subTree, indent, fullPath) {
             for (let child of Object.entries(subTree)) {
-                thisTree.push(`${' '.repeat(indent + 1)}- [${child[0]}](${(fullPath + child[0]).replace(/\s+/g, '_')})`);
+                thisTree.push(`${' '.repeat(indent + 1)}- [${child[0]}](${(`${fullPath}/${child[0]}`).replace(/\s+/g, '_')})`);
     
                 // Recurse with the child's tree, a new indent, and a new full path.
-                if (Object.keys(child[1]).length) looper(child[1], indent + 2, fullPath + child[0]);
+                if (Object.keys(child[1]).length) looper(child[1], indent + 2, `${fullPath}/${child[0]}`);
             }
-        })(children, 1, path.slice(SITEMAP_GEN_PATH.length));
+        })(children, 1, path);
         
         return m.concat(thisTree.join('\n'));
     }, []).join('\n');
