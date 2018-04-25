@@ -138,7 +138,7 @@ function genContent(tree) {
 
         // Recursive function for adding child paths to the above array, and then treating any of children the same way.
         (function looper(subTree, indent, fullPath) {
-            for (let child of subTree.entries()) {
+            for (let child of Object.entries(subTree)) {
                 thisTree.push(`${' '.repeat(indent + 1)}- [${child[0]}](${(fullPath + child[0]).replace(/\s+/g, '_')})`);
     
                 // Recurse with the child's tree, a new indent, and a new full path.
