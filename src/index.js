@@ -53,7 +53,7 @@ app.post('/cartographer-webhook', async (req, res) => {
 
     let thisCommit = body.commits.find(c => c.id === body.after);
     
-    if (!thisCommit || thisCommit.author.name === 'Cartographer') return;
+    if (!thisCommit || thisCommit.message.startsWith('Auto-generate sitemap')) return;
 
     let repo = body.repository.full_name;
     let treeURL = `${BASE_URL}/repos/${repo}/git/trees/${thisCommit.tree_id}?recursive=1`;
@@ -68,6 +68,11 @@ app.post('/cartographer-webhook', async (req, res) => {
     console.log('Received tree data.');
 
     let originalTree = JSON.parse(treeData.body).tree;
+    
+    console.log(originalTree.filter(v => SKIP_FILES ? v.type === 'tree' : true))
+    console.log(originalTree.filter(v => SKIP_FILES ? v.type === 'tree' : true).map(v => v.type === 'tree' ? v.path + '/' : v.path))
+    console.log(originalTree.filter(v => SKIP_FILES ? v.type === 'tree' : true).map(v => v.type === 'tree' ? v.path + '/' : v.path).filter(v => v !== SITEMAP_PATH && v.startsWith(SITEMAP_GEN_PATH)))
+    
     let tree = originalTree.filter(v => SKIP_FILES ? v.type === 'tree' : true).map(v => v.type === 'tree' ? v.path + '/' : v.path);
     tree = tree.filter(v => v !== SITEMAP_PATH && v.startsWith(SITEMAP_GEN_PATH)).reduce((m, val) => {
         // tree is an array of paths, ie. 'file', 'dir/', 'dir/file'.
@@ -98,14 +103,10 @@ app.post('/cartographer-webhook', async (req, res) => {
         },
         auth: AUTH,
         body: JSON.stringify({
-            message: `Auto-generate Wiki sitemap TIMESTAMP ${new Date()}`,
-            content: new Buffer(content).toString('base64'),
+            message: `Auto-generate sitemap TIMESTAMP ${new Date()}`,
+            content: Buffer.from(content).toString('base64'),
             sha: originalTree.find(v => v.path === SITEMAP_PATH) ? originalTree.find(v => v.path === SITEMAP_PATH).sha : null,
-            branch: 'master',
-            commiter: {
-                name: 'Cartographer',
-                email: 'cartographer@headbow.stream'
-            }
+            branch: 'master'
         })
     });
     
