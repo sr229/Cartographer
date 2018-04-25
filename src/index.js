@@ -25,9 +25,11 @@ try {
 const PORT = Number(process.env.PORT) || config.port || 8080;
 const SITEMAP_PATH = process.env.SITEMAP_PATH || config.sitemapPath || 'wiki/_sitemap.md';
 const SITEMAP_GEN_PATH = process.env.SITEMAP_GEN_PATH || config.sitemapGenPath || (SITEMAP_PATH.split('/').length > 1 ? SITEMAP_PATH.slice(0, -(SITEMAP_PATH.split('/').slice(-1)[0].length + 1)) : '');
-const SKIP_FILES = process.env.SKIP_FILES === 'true' || config.skipFiles || true;
+let SKIP_FILES = process.env.SKIP_FILES === 'true' || config.skipFiles;
 const ACCESS_TOKEN = process.env.ACCESS_TOKEN || config.accessToken;
 const ACCESS_USER = process.env.ACCESS_USER || config.accessUser;
+
+if (SKIP_FILES == null) SKIP_FILES = true;
 
 if (!ACCESS_TOKEN) throw new Error('Missing required variable: "ACCESS_TOKEN". Must either be an environment variable, or "accessToken" in config.json');
 if (!ACCESS_USER) throw new Error('Missing required variable: "ACCESS_USER". Must either be an environment variable, or "accessUser" in config.json');
@@ -68,12 +70,6 @@ app.post('/cartographer-webhook', async (req, res) => {
     console.log('Received tree data.');
 
     let originalTree = JSON.parse(treeData.body).tree;
-    
-    console.log(originalTree.filter(v => SKIP_FILES ? v.type === 'tree' : true))
-    console.log(originalTree.filter(v => SKIP_FILES ? v.type === 'tree' : true).map(v => v.type === 'tree' ? v.path + '/' : v.path))
-    console.log(originalTree.filter(v => SKIP_FILES ? v.type === 'tree' : true).map(v => v.type === 'tree' ? v.path + '/' : v.path).filter(v => v !== SITEMAP_PATH && v.startsWith(SITEMAP_GEN_PATH)))
-    console.log(SITEMAP_GEN_PATH)
-    
     let tree = originalTree.filter(v => SKIP_FILES ? v.type === 'tree' : true).map(v => v.type === 'tree' ? v.path + '/' : v.path);
     tree = tree.filter(v => v !== SITEMAP_PATH && v.startsWith(SITEMAP_GEN_PATH)).reduce((m, val) => {
         // tree is an array of paths, ie. 'file', 'dir/', 'dir/file'.
