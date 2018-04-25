@@ -43,19 +43,17 @@ app.engine('html', engines.mustache);
 
 app.post('/cartographer-webhook', async (req, res) => {
     let body = req.body;
+    
+    res.sendStatus(200);
 
     if (body.zen && body.hook_id && body.hook) {
         console.log('Received webhook ping event.');
-        res.sendStatus(200);
         return;
     }
 
     let thisCommit = body.commits.find(c => c.id === body.after);
     
-    if (!thisCommit || thisCommit.author.name === 'Cartographer') {
-        res.sendStatus(200);
-        return;
-    }
+    if (!thisCommit || thisCommit.author.name === 'Cartographer') return;
 
     let repo = body.repository.full_name;
     let treeURL = `${BASE_URL}/repos/${repo}/git/trees/${thisCommit.tree_id}?recursive=1`;
@@ -67,7 +65,7 @@ app.post('/cartographer-webhook', async (req, res) => {
         auth: AUTH
     });
     let originalTree = JSON.parse(treeData.body).tree;
-    let tree = tree.filter(v => SKIP_FILES ? v.type === 'tree' : true).map(v => v.type === 'tree' ? v.path + '/' : v.path);
+    let tree = originalTree.filter(v => SKIP_FILES ? v.type === 'tree' : true).map(v => v.type === 'tree' ? v.path + '/' : v.path);
     tree = tree.filter(v => v !== SITEMAP_PATH && v.startsWith(SITEMAP_GEN_PATH)).reduce((m, val) => {
         // tree is an array of paths, ie. 'file', 'dir/', 'dir/file'.
         // Directories end with a '/'.
@@ -106,8 +104,6 @@ app.post('/cartographer-webhook', async (req, res) => {
             }
         })
     });
-    
-    res.sendStatus(200);
 });
 
 /**
