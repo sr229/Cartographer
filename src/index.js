@@ -131,10 +131,10 @@ function genContent(tree) {
 
     return Object.entries(tree).reduce((m, [path, children]) => {
         // If there are no children for the path, add it and continue.
-        if (!Object.keys(children).length) return m.concat(`- [${path}](${path.replace(/\s+/g, '_')})`);
+        if (!Object.keys(children).length) return m.concat(`- [${path}](${path.slice(SITEMAP_GEN_PATH.length).replace(/\s+/g, '_')})`);
 
         // Make a new array with the path name.
-        let thisTree = [`- [${path}](${path.replace(/\s+/g, '_')})`];
+        let thisTree = [`- [${path}](${path.slice(SITEMAP_GEN_PATH.length).replace(/\s+/g, '_')})`];
 
         // Recursive function for adding child paths to the above array, and then treating any of children the same way.
         (function looper(subTree, indent, fullPath) {
@@ -144,7 +144,7 @@ function genContent(tree) {
                 // Recurse with the child's tree, a new indent, and a new full path.
                 if (Object.keys(child[1]).length) looper(child[1], indent + 2, fullPath + child[0]);
             }
-        })(children, 1, path);
+        })(children, 1, path.slice(SITEMAP_GEN_PATH.length));
         
         return m.concat(thisTree.join('\n'));
     }, []).join('\n');
