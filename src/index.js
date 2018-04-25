@@ -32,7 +32,8 @@ const ACCESS_USER = process.env.ACCESS_USER || config.accessUser;
 if (!ACCESS_TOKEN) throw new Error('Missing required variable: "ACCESS_TOKEN". Must either be an environment variable, or "accessToken" in config.json');
 if (!ACCESS_USER) throw new Error('Missing required variable: "ACCESS_USER". Must either be an environment variable, or "accessUser" in config.json');
 
-const BASE_URL = `https://${ACCESS_USER}:${ACCESS_TOKEN}@api.github.com`;
+const BASE_URL = `https://api.github.com`;
+const AUTH = `${ACCESS_USER}:${ACCESS_TOKEN}`;
 
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
@@ -62,7 +63,8 @@ app.post('/cartographer-webhook', async (req, res) => {
     let treeData = await got(treeURL, {
         headers: {
             Accept: 'application/vnd.github.v3+json'
-        }
+        },
+        auth: AUTH
     });
     let originalTree = JSON.parse(treeData.body).tree;
     let tree = tree.filter(v => SKIP_FILES ? v.type === 'tree' : true).map(v => v.type === 'tree' ? v.path + '/' : v.path);
@@ -93,6 +95,7 @@ app.post('/cartographer-webhook', async (req, res) => {
         headers: {
             Accept: 'application/vnd.github.v3+json'
         },
+        auth: AUTH,
         body: JSON.stringify({
             message: `Auto-generate Wiki sitemap TIMESTAMP ${new Date()}`,
             content: new Buffer(content).toString('base64'),
