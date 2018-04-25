@@ -72,6 +72,7 @@ app.post('/cartographer-webhook', async (req, res) => {
     console.log(originalTree.filter(v => SKIP_FILES ? v.type === 'tree' : true))
     console.log(originalTree.filter(v => SKIP_FILES ? v.type === 'tree' : true).map(v => v.type === 'tree' ? v.path + '/' : v.path))
     console.log(originalTree.filter(v => SKIP_FILES ? v.type === 'tree' : true).map(v => v.type === 'tree' ? v.path + '/' : v.path).filter(v => v !== SITEMAP_PATH && v.startsWith(SITEMAP_GEN_PATH)))
+    console.log(SITEMAP_GEN_PATH)
     
     let tree = originalTree.filter(v => SKIP_FILES ? v.type === 'tree' : true).map(v => v.type === 'tree' ? v.path + '/' : v.path);
     tree = tree.filter(v => v !== SITEMAP_PATH && v.startsWith(SITEMAP_GEN_PATH)).reduce((m, val) => {
