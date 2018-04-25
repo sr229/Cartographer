@@ -74,18 +74,18 @@ app.post('/cartographer-webhook', async (req, res) => {
     tree = tree.filter(v => v !== SITEMAP_PATH && v.startsWith(SITEMAP_GEN_PATH)).reduce((m, val) => {
         // tree is an array of paths, ie. 'file', 'dir/', 'dir/file'.
         // Directories end with a '/'.
-        if (!val.includes('/') || (val.endsWith('/') && !m[val])) return Object.assign(m, {[val]: {}});
+        if (!val.includes('/')) return Object.assign(m, {[val]: {}});
+        if (val.endsWith('/') && !m[val.slice(0, -1)]) return Object.assign(m, {[val.slice(0, -1)]: {}});
         
         let split = Object.entries(val.split('/'));
         let ref = m; // Yay pointers!
 
         for (let [i, part] of split) {
-            if (split[Number(i) + 1]) part += '/';
             if (!ref[part]) ref[part] = {};
             
             ref = ref[part];
         }
-        
+
         return m;
     }, {});
     
