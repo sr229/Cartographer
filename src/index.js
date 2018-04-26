@@ -74,7 +74,7 @@ app.post('/cartographer-webhook', async (req, res) => {
     tree = tree.filter(v => v !== SITEMAP_PATH && v.startsWith(SITEMAP_GEN_PATH)).reduce((m, val) => {
         // tree is an array of paths, ie. 'file', 'dir/', 'dir/file'.
         // Directories end with a '/'.
-        val = val.slice(SITEMAP_GEN_PATH.length);
+        val = val.slice(SITEMAP_GEN_PATH.length + (!SITEMAP_GEN_PATH.endsWith('/') ? 1 : 0));
         
         if (!val) return m;
 
