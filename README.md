@@ -15,16 +15,20 @@ sitemapGenPath: "" # What path to generate the sitemap of. Defaults to the direc
 skipFiles: true # Whether to skip over files while generating the sitemap. Defaults to true.
 accessToken: "" # Access token for GitHub.
 accessUser: "" # Username to access GitHub as. Should be the same username that accessToken was generated for.
+ignorePaths: # Paths that include any of the strings in here will be excluded from the output.
+ - "img/"
+ - "shared/"
 ```
 
 or as the following environment variables (useful if using a "serverless" deployer like Heroku):
 ```
 PORT=8080
-SITEMAP_PATH=wiki/__sitemap.md
+SITEMAP_PATH=wiki/_sitemap.md
 SITEMAP_GEN_PATH=
 SKIP_FILES=true
 ACCESS_TOKEN=
 ACCESS_USER=
+IGNORE_PATHS=["img/", "shared/"]
 ```
 
 Add `http://your-host.com/cartographer-webhook` as a webhook listening to the `push` event on your repository on GitHub, and watch the magic happen.

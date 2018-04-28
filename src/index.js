@@ -25,7 +25,8 @@ try {
 const PORT = Number(process.env.PORT) || config.port || 8080;
 const SITEMAP_PATH = process.env.SITEMAP_PATH || config.sitemapPath || 'wiki/_sitemap.md';
 const SITEMAP_GEN_PATH = process.env.SITEMAP_GEN_PATH || config.sitemapGenPath || (SITEMAP_PATH.split('/').length > 1 ? SITEMAP_PATH.slice(0, -(SITEMAP_PATH.split('/').slice(-1)[0].length + 1)) : '');
-let SKIP_FILES = process.env.SKIP_FILES === 'true' || config.skipFiles;
+let SKIP_FILES = process.env.SKIP_FILES === 'true' || config.skipFiles || ['img/', 'shared/'];
+const IGNORE_PATHS = (process.env.IGNORE_PATHS ? JSON.parse(process.env.IGNORE_PATHS) : null) || config.ignorePaths || ['img/', 'shared/'];
 const ACCESS_TOKEN = process.env.ACCESS_TOKEN || config.accessToken;
 const ACCESS_USER = process.env.ACCESS_USER || config.accessUser;
 
@@ -71,7 +72,7 @@ app.post('/cartographer-webhook', async (req, res) => {
 
     let originalTree = JSON.parse(treeData.body).tree;
     let tree = originalTree.filter(v => SKIP_FILES ? v.type === 'tree' : true).map(v => v.type === 'tree' ? v.path + '/' : v.path);
-    tree = tree.filter(v => v !== SITEMAP_PATH && v.startsWith(SITEMAP_GEN_PATH)).reduce((m, val) => {
+    tree = tree.filter(v => v !== SITEMAP_PATH && v.startsWith(SITEMAP_GEN_PATH) && !IGNORE_PATHS.map(end => v.includes(end)).reduce((m, va) => m || va)).reduce((m, val) => {
         // tree is an array of paths, ie. 'file', 'dir/', 'dir/file'.
         // Directories end with a '/'.
         val = val.slice(SITEMAP_GEN_PATH.length + (!SITEMAP_GEN_PATH.endsWith('/') ? 1 : 0));
